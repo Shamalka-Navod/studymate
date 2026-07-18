@@ -1,0 +1,76 @@
+.notes-container{
+    padding:40px;
+}
+
+
+.notes-container h1{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+
+.search-box{
+    width:100%;
+    max-width:500px;
+    padding:14px;
+    border-radius:12px;
+    border:1px solid #ddd;
+    margin-bottom:30px;
+    font-size:16px;
+}
+
+
+.notes-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:25px;
+}
+
+
+.note-card{
+
+    background:white;
+    padding:25px;
+    border-radius:20px;
+
+    box-shadow:
+    0 10px 25px rgba(0,0,0,0.08);
+
+    transition:0.3s;
+
+}
+
+
+.note-card:hover{
+
+    transform:translateY(-5px);
+
+}
+
+
+.note-card h2{
+
+    margin-bottom:10px;
+
+}
+
+
+.note-card span{
+
+    background:#7c3aed;
+    color:white;
+
+    padding:5px 12px;
+    border-radius:20px;
+
+    font-size:13px;
+
+}
+
+
+.note-card p{
+
+    margin-top:20px;
+    color:#555;
+
+}

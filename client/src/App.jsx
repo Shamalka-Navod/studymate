@@ -1,12 +1,29 @@
+import Sidebar from "./components/Sidebar";
 import Notes from "./pages/Notes";
-import "./App.css";
 
-function App() {
+
+function App(){
+
   return (
-    <div>
-      <Notes />
+
+    <div className="
+      flex
+      min-h-screen
+      bg-gray-100
+    ">
+
+
+      <Sidebar/>
+
+
+      <Notes/>
+
+
     </div>
-  );
+
+  )
+
 }
+
 
 export default App;
