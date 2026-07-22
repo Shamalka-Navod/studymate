@@ -1,153 +1,394 @@
 import {
   FiTrash2,
   FiEdit,
-  FiCpu
+  FiCpu,
+  FiBookOpen,
+  FiChevronDown,
+  FiChevronUp
 } from "react-icons/fi";
+
+import { useState } from "react";
 
 
 function NoteCard({
   note,
   onDelete,
   onEdit,
-  onSummary
+  onSummary,
+  onQuiz
 }) {
 
 
-  return (
-
-    <div className="
-      bg-white
-      rounded-2xl
-      p-6
-      shadow-md
-      hover:shadow-xl
-      transition
-    ">
-
-
-      <h3 className="
-        text-xl
-        font-bold
-      ">
-        {note.title}
-      </h3>
+const [showSummary,setShowSummary] = useState(false);
 
 
 
-      <span className="
-        inline-block
-        mt-3
-        bg-purple-100
-        text-purple-700
-        px-3
-        py-1
-        rounded-full
-      ">
+return (
 
-        {note.subject}
-
-      </span>
-
-
-
-      <p className="
-        mt-4
-        text-gray-600
-      ">
-
-        {note.content}
-
-      </p>
+<div className="
+bg-white
+dark:bg-gray-800
+rounded-3xl
+p-6
+shadow-md
+hover:shadow-2xl
+transition
+duration-300
+border
+border-gray-100
+dark:border-gray-700
+">
 
 
 
 
-      {
-        note.summary && (
 
-        <div className="
-          mt-4
-          bg-green-100
-          p-3
-          rounded-xl
-        ">
+{/* Title */}
 
-          🤖 {note.summary}
-
-        </div>
-
-        )
-      }
+<div className="
+flex
+justify-between
+items-start
+">
 
 
+<div>
 
 
-      <div className="
-        flex
-        gap-3
-        mt-5
-      ">
+<h3 className="
+text-xl
+font-bold
+text-gray-800
+dark:text-white
+">
 
+{note.title}
 
-        <button
-
-        onClick={()=>onEdit(note)}
-
-        className="
-        bg-blue-100
-        text-blue-600
-        p-3
-        rounded-xl
-        ">
-
-          <FiEdit/>
-
-        </button>
+</h3>
 
 
 
+<span className="
+inline-block
+mt-3
+px-3
+py-1
+rounded-full
+text-sm
+bg-purple-100
+text-purple-700
+dark:bg-purple-900
+dark:text-purple-200
+">
 
-        <button
+{note.subject}
 
-        onClick={()=>onDelete(note._id)}
-
-        className="
-        bg-red-100
-        text-red-600
-        p-3
-        rounded-xl
-        ">
-
-          <FiTrash2/>
-
-        </button>
+</span>
 
 
-
-
-        <button
-
-        onClick={()=>onSummary(note)}
-
-        className="
-        bg-green-100
-        text-green-600
-        p-3
-        rounded-xl
-        ">
-
-          <FiCpu/>
-
-        </button>
+</div>
 
 
 
-      </div>
+<div className="
+text-purple-600
+dark:text-purple-300
+text-2xl
+">
+
+📚
+
+</div>
 
 
-    </div>
 
-  );
+</div>
+
+
+
+
+
+
+
+
+
+{/* Content */}
+
+<p className="
+mt-5
+text-gray-600
+dark:text-gray-300
+line-clamp-3
+">
+
+
+{note.content}
+
+
+</p>
+
+
+
+
+
+
+
+
+
+{/* Summary */}
+
+{
+
+note.summary && (
+
+
+<div className="
+mt-5
+bg-green-50
+dark:bg-green-900/30
+rounded-xl
+p-4
+">
+
+
+<button
+
+onClick={()=>setShowSummary(!showSummary)}
+
+className="
+flex
+items-center
+justify-between
+w-full
+font-semibold
+text-green-700
+dark:text-green-300
+"
+
+
+>
+
+
+<span>
+
+🤖 AI Summary
+
+</span>
+
+
+{
+
+showSummary
+
+?
+
+<FiChevronUp/>
+
+:
+
+<FiChevronDown/>
+
+}
+
+
+</button>
+
+
+
+
+
+{
+
+showSummary && (
+
+
+<p className="
+mt-3
+text-sm
+text-gray-700
+dark:text-gray-200
+leading-relaxed
+">
+
+
+{note.summary}
+
+
+</p>
+
+
+)
+
+
+}
+
+
+
+</div>
+
+
+)
+
+}
+
+
+
+
+
+
+
+
+
+{/* Buttons */}
+
+<div className="
+flex
+gap-3
+mt-6
+flex-wrap
+">
+
+
+
+
+
+{/* Edit */}
+
+<button
+
+onClick={()=>onEdit(note)}
+
+className="
+p-3
+rounded-xl
+bg-blue-100
+text-blue-600
+hover:scale-110
+transition
+dark:bg-blue-900
+dark:text-blue-300
+"
+
+title="Edit"
+
+>
+
+<FiEdit/>
+
+</button>
+
+
+
+
+
+
+
+
+{/* Delete */}
+
+<button
+
+onClick={()=>onDelete(note._id)}
+
+className="
+p-3
+rounded-xl
+bg-red-100
+text-red-600
+hover:scale-110
+transition
+dark:bg-red-900
+dark:text-red-300
+"
+
+title="Delete"
+
+>
+
+<FiTrash2/>
+
+</button>
+
+
+
+
+
+
+
+
+
+{/* AI Summary */}
+
+<button
+
+onClick={()=>onSummary(note)}
+
+className="
+p-3
+rounded-xl
+bg-green-100
+text-green-600
+hover:scale-110
+transition
+dark:bg-green-900
+dark:text-green-300
+"
+
+title="Generate Summary"
+
+>
+
+<FiCpu/>
+
+</button>
+
+
+
+
+
+
+
+
+{/* Quiz */}
+
+<button
+
+onClick={()=>onQuiz(note)}
+
+className="
+p-3
+rounded-xl
+bg-purple-100
+text-purple-600
+hover:scale-110
+transition
+dark:bg-purple-900
+dark:text-purple-300
+"
+
+title="Generate Quiz"
+
+>
+
+<FiBookOpen/>
+
+</button>
+
+
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+);
+
 
 }
 

@@ -1,13 +1,30 @@
-.menu-item{
+@import "tailwindcss";
 
-    @apply
-    flex
-    items-center
-    gap-3
-    p-3
-    rounded-xl
-    cursor-pointer
-    hover:bg-white/20
-    transition;
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+
+body{
+
+margin:0;
+
+background:#f3f4f6;
+
+}
+
+
+
+.dark body{
+
+background:#111827;
+
+}
+
+
+
+#root{
+
+min-height:100vh;
 
 }

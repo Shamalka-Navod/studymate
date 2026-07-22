@@ -1,27 +1,46 @@
-import Sidebar from "./components/Sidebar";
+import {
+  Routes,
+  Route
+} from "react-router-dom";
+
+
+import MainLayout from "./layouts/MainLayout";
+
+import Dashboard from "./pages/Dashboard";
+
 import Notes from "./pages/Notes";
+import Summary from "./pages/Summary";
+import Settings from "./pages/Settings";
 
 
 function App(){
 
-  return (
 
-    <div className="
-      flex
-      min-h-screen
-      bg-gray-100
-    ">
+return (
+
+<MainLayout>
 
 
-      <Sidebar/>
+<Routes>
 
 
-      <Notes/>
+<Route path="/" element={<Dashboard/>}/>
+
+<Route path="/notes" element={<Notes/>}/>
+
+<Route path="/summary" element={<Summary/>}/>
+
+<Route path="/settings" element={<Settings/>}/>
 
 
-    </div>
+</Routes>
 
-  )
+
+</MainLayout>
+
+
+);
+
 
 }
 

@@ -2,68 +2,207 @@ import {
   FiHome,
   FiBook,
   FiCpu,
-  FiSettings
+  FiSettings,
+  FiX
 } from "react-icons/fi";
 
-
-function Sidebar(){
-
-  return (
-
-    <aside className="
-      w-64
-      min-h-screen
-      bg-gradient-to-b
-      from-purple-600
-      to-indigo-700
-      text-white
-      p-6
-      hidden
-      md:block
-    ">
-
-      <h1 className="
-        text-2xl
-        font-bold
-        mb-10
-      ">
-        📚 StudyMate
-      </h1>
+import {
+  NavLink
+} from "react-router-dom";
 
 
-      <nav className="space-y-4">
+function Sidebar({open,setOpen}) {
 
 
-        <div className="menu-item">
-          <FiHome/>
-          Dashboard
-        </div>
+const menu = [
+
+{
+name:"Dashboard",
+path:"/",
+icon:<FiHome/>,
+end:true
+},
 
 
-        <div className="menu-item">
-          <FiBook/>
-          Notes
-        </div>
+{
+name:"Notes",
+path:"/notes",
+icon:<FiBook/>
+},
 
 
-        <div className="menu-item">
-          <FiCpu/>
-          AI Summary
-        </div>
+{
+name:"AI Summary",
+path:"/summary",
+icon:<FiCpu/>
+},
 
 
-        <div className="menu-item">
-          <FiSettings/>
-          Settings
-        </div>
+{
+name:"Settings",
+path:"/settings",
+icon:<FiSettings/>
+}
 
 
-      </nav>
+];
 
 
-    </aside>
 
-  )
+return (
+
+
+<aside className={`
+fixed
+md:static
+top-0
+left-0
+h-screen
+w-64
+bg-white
+dark:bg-gray-800
+shadow-lg
+p-5
+z-50
+transform
+
+${open ? "translate-x-0" : "-translate-x-full"}
+
+md:translate-x-0
+
+transition-transform
+duration-300
+`}>
+
+
+
+<div className="
+flex
+justify-between
+items-center
+mb-8
+">
+
+
+<h1 className="
+text-2xl
+font-bold
+text-purple-600
+">
+
+StudyMate
+
+</h1>
+
+
+
+<button
+
+onClick={()=>setOpen && setOpen(false)}
+
+className="
+md:hidden
+text-red-500
+"
+
+>
+
+<FiX size={22}/>
+
+</button>
+
+
+</div>
+
+
+
+
+
+
+<nav className="
+space-y-3
+">
+
+
+{
+
+menu.map((item,index)=>(
+
+
+<NavLink
+
+key={index}
+
+to={item.path}
+
+end={item.end}
+
+onClick={()=>setOpen && setOpen(false)}
+
+
+className={({isActive})=>
+
+`
+
+flex
+items-center
+gap-3
+px-4
+py-3
+rounded-xl
+transition
+
+
+${
+isActive
+
+?
+
+"bg-purple-600 text-white"
+
+:
+
+"text-gray-600 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-gray-700"
+
+}
+
+`
+
+}
+
+
+>
+
+
+{item.icon}
+
+
+<span>
+
+{item.name}
+
+</span>
+
+
+</NavLink>
+
+
+))
+
+
+}
+
+
+</nav>
+
+
+
+
+</aside>
+
+
+);
+
 
 }
 

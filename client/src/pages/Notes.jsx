@@ -1,9 +1,18 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
 
 import NoteCard from "../components/NoteCard";
-import Navbar from "../components/Navbar";
+
+import QuizModal from "../components/QuizModal";
+
+import {
+  getNotes,
+  createNote,
+  updateNote,
+  deleteNote as deleteNoteApi,
+  generateSummary as generateSummaryApi,
+  generateQuiz as generateQuizApi,
+} from "../services/api";
 
 
 function Notes() {
@@ -18,43 +27,47 @@ function Notes() {
 
   const [editId, setEditId] = useState(null);
 
+  const [selectedQuiz, setSelectedQuiz] = useState([]);
+
+  const [showQuizModal, setShowQuizModal] = useState(false);
+
 
   const [form, setForm] = useState({
     title: "",
     subject: "",
-    content: ""
+    content: "",
   });
 
 
 
   // Fetch Notes
+  const fetchNotes = async () => {
+
+    try {
+
+      const res = await getNotes();
+
+      setNotes(res.data);
+
+
+    } catch(error) {
+
+      console.log(error);
+
+      toast.error("Failed to load notes");
+
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+
+
   useEffect(() => {
-
-    const fetchNotes = async () => {
-
-      try {
-
-        const res = await axios.get(
-          "http://localhost:5000/api/notes"
-        );
-
-        setNotes(res.data);
-
-
-      } catch (error) {
-
-        console.log(error);
-
-        toast.error("Failed to load notes");
-
-      } finally {
-
-        setLoading(false);
-
-      }
-
-    };
-
 
     fetchNotes();
 
@@ -64,37 +77,42 @@ function Notes() {
 
 
 
-  // Add / Update Note
-  const saveNote = async () => {
 
+  // Save Note
+  const saveNote = async () => {
 
     try {
 
 
-      if (editId) {
+      if(
+        !form.title ||
+        !form.subject ||
+        !form.content
+      ){
+
+        return toast.error(
+          "Please fill all fields"
+        );
+
+      }
 
 
-        const res = await axios.put(
 
-          `http://localhost:5000/api/notes/${editId}`,
+      if(editId){
 
+
+        const res = await updateNote(
+          editId,
           form
-
         );
 
 
         setNotes(
-
           notes.map(note =>
-
             note._id === editId
-
             ? res.data
-
             : note
-
           )
-
         );
 
 
@@ -103,31 +121,21 @@ function Notes() {
         );
 
 
-      } else {
+      }else{
 
 
-        const res = await axios.post(
-
-          "http://localhost:5000/api/notes",
-
-          form
-
-        );
+        const res = await createNote(form);
 
 
         setNotes([
-
           res.data,
-
           ...notes
-
         ]);
 
 
         toast.success(
           "Note Added Successfully 🎉"
         );
-
 
       }
 
@@ -136,9 +144,7 @@ function Notes() {
       clearForm();
 
 
-
-    } catch (error) {
-
+    }catch(error){
 
       console.log(error);
 
@@ -146,9 +152,7 @@ function Notes() {
         "Something went wrong"
       );
 
-
     }
-
 
   };
 
@@ -157,8 +161,9 @@ function Notes() {
 
 
 
+
   // Edit Note
-  const editNote = (note) => {
+  const editNote = (note)=>{
 
 
     setForm({
@@ -186,27 +191,19 @@ function Notes() {
 
 
   // Delete Note
-  const deleteNote = async (id) => {
+  const deleteNote = async(id)=>{
 
 
-    try {
+    try{
 
 
-      await axios.delete(
-
-        `http://localhost:5000/api/notes/${id}`
-
-      );
+      await deleteNoteApi(id);
 
 
       setNotes(
-
         notes.filter(
-
-          note => note._id !== id
-
+          note=>note._id !== id
         )
-
       );
 
 
@@ -215,15 +212,13 @@ function Notes() {
       );
 
 
-    } catch (error) {
-
+    }catch(error){
 
       console.log(error);
 
       toast.error(
         "Delete failed"
       );
-
 
     }
 
@@ -237,37 +232,21 @@ function Notes() {
 
 
   // AI Summary
-  const generateSummary = async (note) => {
+  const generateSummary = async(note)=>{
 
 
-    const summary =
-
-      note.content.substring(0, 100) + "...";
+    try{
 
 
-
-    try {
-
-
-      const res = await axios.put(
-
-        `http://localhost:5000/api/notes/${note._id}`,
-
-        {
-
-          ...note,
-
-          summary
-
-        }
-
+      const res =
+      await generateSummaryApi(
+        note._id
       );
-
 
 
       setNotes(
 
-        notes.map(n =>
+        notes.map(n=>
 
           n._id === note._id
 
@@ -280,19 +259,18 @@ function Notes() {
       );
 
 
-
       toast.success(
         "AI Summary Generated 🤖"
       );
 
 
-    } catch (error) {
+    }catch(error){
 
 
       console.log(error);
 
       toast.error(
-        "Summary failed"
+        "Summary generation failed"
       );
 
 
@@ -306,17 +284,87 @@ function Notes() {
 
 
 
+
+  // AI Quiz
+  const generateQuiz = async(note)=>{
+
+
+    try{
+
+
+      const res =
+      await generateQuizApi(
+        note._id
+      );
+
+
+
+      setNotes(
+
+        notes.map(n=>
+
+          n._id === note._id
+
+          ? {
+              ...n,
+              quiz:res.data.quiz
+            }
+
+          : n
+
+        )
+
+      );
+
+
+
+      setSelectedQuiz(
+        res.data.quiz
+      );
+
+
+      setShowQuizModal(true);
+
+
+
+      toast.success(
+        "Quiz Generated 📝"
+      );
+
+
+
+    }catch(error){
+
+
+      console.log(error);
+
+      toast.error(
+        "Quiz generation failed"
+      );
+
+
+    }
+
+
+  };
+
+
+
+
+
+
+
   // Clear Form
-  const clearForm = () => {
+  const clearForm = ()=>{
 
 
     setForm({
 
-      title: "",
+      title:"",
 
-      subject: "",
+      subject:"",
 
-      content: ""
+      content:""
 
     });
 
@@ -333,12 +381,15 @@ function Notes() {
 
 
 
+
   // Search
-  const filteredNotes = notes.filter(note =>
+  const filteredNotes = notes.filter(note=>
 
     note.title
-      .toLowerCase()
-      .includes(search.toLowerCase())
+    .toLowerCase()
+    .includes(
+      search.toLowerCase()
+    )
 
   );
 
@@ -353,7 +404,6 @@ function Notes() {
     <main className="flex-1 p-6">
 
 
-      <Navbar />
 
 
 
@@ -370,14 +420,17 @@ function Notes() {
           <h1 className="
             text-3xl
             font-bold
-            text-gray-800
           ">
+
             My Notes 📚
+
           </h1>
 
 
           <p className="text-gray-500">
+
             Manage your study materials
+
           </p>
 
         </div>
@@ -387,16 +440,18 @@ function Notes() {
 
         <button
 
-          onClick={() => setShowForm(!showForm)}
+          onClick={()=>
+            setShowForm(!showForm)
+          }
 
           className="
-          bg-purple-600
-          text-white
-          px-5
-          py-3
-          rounded-xl
-          hover:bg-purple-700
+            bg-purple-600
+            text-white
+            px-5
+            py-3
+            rounded-xl
           "
+
         >
 
           + Add Note
@@ -438,20 +493,16 @@ function Notes() {
 
               value={form.title}
 
-              onChange={(e) =>
+              onChange={(e)=>
 
                 setForm({
-
                   ...form,
-
                   title:e.target.value
-
                 })
 
               }
 
             />
-
 
 
 
@@ -469,21 +520,16 @@ function Notes() {
 
               value={form.subject}
 
-              onChange={(e) =>
+              onChange={(e)=>
 
                 setForm({
-
                   ...form,
-
                   subject:e.target.value
-
                 })
 
               }
 
             />
-
-
 
 
 
@@ -501,21 +547,16 @@ function Notes() {
 
               value={form.content}
 
-              onChange={(e) =>
+              onChange={(e)=>
 
                 setForm({
-
                   ...form,
-
                   content:e.target.value
-
                 })
 
               }
 
             />
-
-
 
 
 
@@ -530,18 +571,16 @@ function Notes() {
               py-3
               rounded-xl
               "
+
             >
 
               {
-
                 editId
-
-                ? "Update Note"
-
-                : "Save Note"
-
+                ?
+                "Update Note"
+                :
+                "Save Note"
               }
-
 
             </button>
 
@@ -549,7 +588,6 @@ function Notes() {
           </div>
 
         )
-
       }
 
 
@@ -565,18 +603,16 @@ function Notes() {
         mt-6
         w-full
         p-4
-        rounded-xl
         border
+        rounded-xl
         "
 
         placeholder="Search notes..."
 
         value={search}
 
-        onChange={(e) =>
-
+        onChange={(e)=>
           setSearch(e.target.value)
-
         }
 
       />
@@ -588,118 +624,79 @@ function Notes() {
 
 
 
-
       {
-
-        loading ? (
-
-
-          <div className="
-            mt-10
-            flex
-            justify-center
-          ">
+        loading ?
 
 
-            <div className="
-              w-10
-              h-10
-              border-4
-              border-purple-600
-              border-t-transparent
-              rounded-full
-              animate-spin
-            ">
+        <div className="mt-10 text-center">
+
+          Loading...
+
+        </div>
 
 
-            </div>
+
+        :
+
+        <div className="
+          grid
+          md:grid-cols-2
+          lg:grid-cols-3
+          gap-6
+          mt-8
+        ">
 
 
-          </div>
+        {
+          filteredNotes.map(note=>(
 
 
-        )
+            <NoteCard
+
+              key={note._id}
+
+              note={note}
+
+              onDelete={deleteNote}
+
+              onEdit={editNote}
+
+              onSummary={generateSummary}
+
+              onQuiz={generateQuiz}
+
+            />
 
 
-        : filteredNotes.length === 0 ? (
+          ))
+        }
 
 
-          <div className="
-            mt-10
-            bg-white
-            p-10
-            rounded-2xl
-            text-center
-          ">
-
-
-            <h2 className="
-              text-2xl
-              font-bold
-            ">
-
-              No Notes Found 📚
-
-            </h2>
-
-
-            <p className="text-gray-500">
-
-              Add your first study note
-
-            </p>
-
-
-          </div>
-
-
-        )
-
-
-        : (
-
-
-          <div className="
-            grid
-            md:grid-cols-2
-            lg:grid-cols-3
-            gap-6
-            mt-8
-          ">
-
-
-            {
-
-              filteredNotes.map(note => (
-
-
-                <NoteCard
-
-                  key={note._id}
-
-                  note={note}
-
-                  onDelete={deleteNote}
-
-                  onEdit={editNote}
-
-                  onSummary={generateSummary}
-
-                />
-
-
-              ))
-
-            }
-
-
-          </div>
-
-
-        )
-
+        </div>
 
       }
+
+
+
+
+
+
+      {
+        showQuizModal && (
+
+          <QuizModal
+
+            quiz={selectedQuiz}
+
+            onClose={()=>
+              setShowQuizModal(false)
+            }
+
+          />
+
+        )
+      }
+
 
 
 
