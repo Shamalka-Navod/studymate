@@ -285,7 +285,6 @@ MONGODB_URI=mongodb+srv://studymate:StudyMate123@cluster0.78o2jrr.mongodb.net/st
 PORT=5000
 GROQ_API_KEY=YOUR_GROQ_API_KEY
 
-
 Run backend:
 npm run dev
 
